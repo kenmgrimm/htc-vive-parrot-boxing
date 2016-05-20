@@ -18,10 +18,6 @@ public class Recorder : MonoBehaviour {
 		InvokeRepeating("RecordFrame", 0, 0.012f);
 	}
 	
-	void Update () {
-
-	}
-	
 	void RecordFrame() {
 		print(Time.deltaTime);
 		for (int i = 0; i < trackedTransforms.Length; i++) {
@@ -49,17 +45,10 @@ public class Recorder : MonoBehaviour {
 				tracked.rotation.z + "," +
 				tracked.rotation.w
 				);
-				
-				// totalTime += Time.deltaTime;
-				// print(totalTime);
+
 		}
 	}
-	
-	void FixedUpdate() {
-		
-	}
-	
-	
+
 	void Destroy () {
 		streamWriter.Close();
 	}
