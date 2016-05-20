@@ -14,11 +14,7 @@ public class Player : MonoBehaviour {
 	
 	void Start () {
 		streamReader = new StreamReader("recorder.txt");
-		InvokeRepeating("ReplayFrame", 0, 0.012f);
-	}
-	
-	void Update () {
-
+		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
 	
 	void ReplayFrame () {
@@ -26,6 +22,8 @@ public class Player : MonoBehaviour {
 			string line = streamReader.ReadLine();
 
 			if (line == null) {
+				streamReader.BaseStream.Position = 0;
+				streamReader.DiscardBufferedData(); 
 				return;
 			}
 

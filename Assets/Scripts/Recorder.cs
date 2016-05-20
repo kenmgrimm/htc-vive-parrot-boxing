@@ -15,7 +15,7 @@ public class Recorder : MonoBehaviour {
 	void Start () {
 	  streamWriter = new StreamWriter("recorder.txt");
 		
-		InvokeRepeating("RecordFrame", 0, 0.012f);
+		InvokeRepeating("RecordFrame", 0, 0.011f);
 	}
 	
 	void RecordFrame() {
