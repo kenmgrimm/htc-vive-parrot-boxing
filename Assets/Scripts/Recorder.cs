@@ -15,7 +15,11 @@ public class Recorder : MonoBehaviour {
 	void Start () {
 	  streamWriter = new StreamWriter("recorder.txt");
 		
-		InvokeRepeating("RecordFrame", 0, 0.011f);
+		GameObject.FindGameObjectWithTag("Head").SetActive(false);
+		GameObject.FindGameObjectWithTag("Left Fist").SetActive(false);
+		GameObject.FindGameObjectWithTag("Right Fist").SetActive(false);
+		
+		InvokeRepeating("RecordFrame", 10, 0.011f);
 	}
 	
 	void RecordFrame() {
