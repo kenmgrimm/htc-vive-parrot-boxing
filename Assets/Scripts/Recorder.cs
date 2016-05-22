@@ -30,16 +30,7 @@ public class Recorder : MonoBehaviour {
 			
 			parrotingTransforms[i].position = tracked.position;
 			parrotingTransforms[i].rotation = tracked.rotation;
-			print(name + ':' + 
-				tracked.position.x + "," + 
-				tracked.position.y + "," +
-				tracked.position.z + "|" +
-				tracked.rotation.x + "," +
-				tracked.rotation.y + "," +
-				tracked.rotation.z + "," +
-				tracked.rotation.w
-				);
-				
+
 		  streamWriter.WriteLine(name + ':' + 
 				tracked.position.x + "," + 
 				tracked.position.y + "," +
