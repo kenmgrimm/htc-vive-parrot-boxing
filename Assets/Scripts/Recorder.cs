@@ -2,9 +2,6 @@
 using UnityEngine;
 
 public class Recorder : MonoBehaviour {
-	// [SerializeField]
-	// private TrackedTransform[] trackedTransforms = new TrackedTransform[3];
-	
 	public string[] names;
 	public float totalTime = 0f;
 	public Transform[] trackedTransforms;
