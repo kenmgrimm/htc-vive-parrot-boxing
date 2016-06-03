@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 	[SerializeField]
+	private bool rotate = false;
+	
+	[SerializeField]
 	private string[] trackedTransformNames;
 	[SerializeField]
 	private Transform[] avatarTransforms;
@@ -14,20 +17,27 @@ public class Player : MonoBehaviour {
 	private GameObject avatar;
 	private GameObject body;
 	
+	// Eventually these should be imported as the body transform
+	private Vector3 avatarStartPosition = new Vector3(0.72f, 0.5f, 0);
+	private Quaternion avatarStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+	
 	void Awake () {
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
 		
-		avatar = GameObject.FindGameObjectWithTag("Avatar");
+		avatar = GameObject.FindGameObjectWithTag("Avatar");		
 		body = GameObject.Find("Capsule");
 		
-		streamReader = new StreamReader("recorder.txt");
+		streamReader = new StreamReader("recorder2.txt");
+		
 		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
 	
 	void ReplayFrame () {
 		char[] fieldTerminators = {':', ',', '|'};
 		
-		// avatar.transform.Rotate(Vector3.left);
+		if(rotate) {
+			avatar.transform.RotateAround(body.transform.position, Vector3.up, 0.25f);	
+		}
 		
  		for(int i = 0; i < avatarTransforms.Length; i++) {
 			Transform controller = avatarTransforms[i];
@@ -36,7 +46,8 @@ public class Player : MonoBehaviour {
 
 			if (line == null) {
 				streamReader.BaseStream.Position = 0;
-				streamReader.DiscardBufferedData(); 
+				streamReader.DiscardBufferedData();
+				
 				return;
 			}
 
@@ -46,22 +57,32 @@ public class Player : MonoBehaviour {
 			Vector3 currentPosition = new Vector3(float.Parse(values[1]), float.Parse(values[2]), float.Parse(values[3]));
 			Quaternion currentRotation = new Quaternion(float.Parse(values[4]), float.Parse(values[5]), float.Parse(values[6]), float.Parse(values[7]));
 
+			// First frame played for this controller
 			if (previousTransformOrientations[i] == null) {
-				// Move avatar to starting location
-				if(i == 0) {
-					avatar.transform.position = currentPosition - new Vector3(0, 1, 0);
-					avatar.transform.rotation = currentRotation;
+        previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
+				
+        // Move avatar to starting location)
+        if (i == 0) {  // first frame
+          avatar.transform.position = avatarStartPosition;
+          avatar.transform.rotation = avatarStartRotation;
 				}
-				previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
-				controller.position = currentPosition;
-				controller.rotation = currentRotation;
-			}
+      }
+		
+			// Print all positions / rotations relative to body to help us locally position inside Avatar	
+			// print(this.avatarTransforms[0].position - this.body.transform.position);
+			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[0].rotation).eulerAngles);
+			
+			// print(this.avatarTransforms[1].position - this.body.transform.position);
+			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[1].rotation).eulerAngles);
+			
+			// print(this.avatarTransforms[2].position - this.body.transform.position);
+			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[2].rotation).eulerAngles);
 			
 			TransformOrientation previousOrientation = previousTransformOrientations[i];	
 
-			Debug.Log(name);
-			Debug.Log("previousOrientation.rotation: " + previousOrientation.rotation.ToString("F4"));
-			Debug.Log("current.rotation: " + currentRotation.ToString("F4"));
+			// Debug.Log(name);
+			// Debug.Log("previousOrientation.rotation: " + previousOrientation.rotation.ToString("F4"));
+			// Debug.Log("current.rotation: " + currentRotation.ToString("F4"));
 			
 			Vector3 velocity = currentPosition - previousOrientation.position;
 			
@@ -69,24 +90,25 @@ public class Player : MonoBehaviour {
 			Quaternion rotation = Quaternion.Inverse(previousOrientation.rotation) * currentRotation;
 			// Vector3 rotation = currentRotation.eulerAngles - previousOrientation.rotation.eulerAngles;
 			// Quaternion rotation = Quaternion.FromToRotation(previousOrientation.rotation.eulerAngles, currentRotation.eulerAngles);
-			Debug.Log("Velocity: " + velocity.ToString("F4"));
-			Debug.Log("Rotation: " + rotation.ToString("F4"));
+			// Debug.Log("Velocity: " + velocity.ToString("F4"));
+			// Debug.Log("Rotation: " + rotation.ToString("F4"));
 			
-			controller.position += velocity;
+			controller.localPosition += velocity;
 			
+			// Move body under head
 			if (i == 0) {
-				body.transform.position = controller.position - new Vector3(0, 0.5f, 0);	
-				body.transform.rotation = Quaternion.identity;
+				body.transform.localPosition = controller.localPosition - new Vector3(0, 0.5f, 0);	
+				body.transform.localRotation = Quaternion.identity;
 			}
 			
-			controller.rotation *= rotation;
-			// controller.Rotate(rotation);
+			controller.localRotation *= rotation;
 			
 			previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
 			
-			Debug.Log("Set previous to: " + previousTransformOrientations[i].position.ToString("F4"));
-			Debug.Log("Set previous to: " + previousTransformOrientations[i].rotation.ToString("F4"));
+			// Debug.Log("Set previous to: " + previousTransformOrientations[i].position.ToString("F4"));
+			// Debug.Log("Set previous to: " + previousTransformOrientations[i].rotation.ToString("F4"));
 		}
+		
 	}
 	
 	void Destroy () {
