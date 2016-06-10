@@ -1,42 +1,91 @@
-﻿using System.IO;
+using System.IO;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Opponent : MonoBehaviour {
 	[SerializeField]
 	private bool rotate = false;
+
+	[SerializeField]
+	private float rotationSpeed = 1.0f;
+	[SerializeField]
+	private float stepSpeed = 1.0f;
 	
 	[SerializeField]
 	private string[] trackedTransformNames;
 	[SerializeField]
 	private Transform[] avatarTransforms;
+
+  [SerializeField]
+  private Transform player;
+  [SerializeField]
+  private GameObject mockPlayerPrefab;
+
+  [SerializeField]
+  private bool mockPlayer = true;
 	
 	private TransformOrientation[] previousTransformOrientations;
 	
 	private StreamReader streamReader;
 	
-	private GameObject avatar;
+	private GameObject opponent;
 	private GameObject body;
 	
 	// Eventually these should be imported as the body transform
-	private Vector3 avatarStartPosition = new Vector3(0.72f, 0.5f, 0);
-	private Quaternion avatarStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+	private Vector3 opponentStartPosition = new Vector3(0.933f, 0, 0);
+	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 270, 0));
+
+  private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.5f, 0);
+	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 180, 0));
 	
 	void Awake () {
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
 		
-		avatar = GameObject.FindGameObjectWithTag("Avatar");		
+    if(mockPlayer) {
+      player = (
+        GameObject.Instantiate(mockPlayerPrefab, mockPlayerStartPosition, mockPlayerStartRotation) as GameObject
+      ).transform;
+    }
+
+		opponent = GameObject.FindGameObjectWithTag("Avatar");		
 		body = GameObject.Find("Capsule");
 		
 		streamReader = new StreamReader("recorder2.txt");
 		
+    InvokeRepeating("MoveOpponent", 1, 1);
+
 		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
+
+	void Update () {
+	}
 	
+  void MoveOpponent() {
+		Vector3 playerPos = player.position;
+		Vector3 oppPos = opponent.transform.position;
+		Vector3 towardsPlayer = playerPos - oppPos;
+		Quaternion lookRotation = Quaternion.LookRotation(towardsPlayer.normalized);
+	
+
+    float distance = Vector3.Distance(player.position, opponent.transform.position);
+    if (distance > 1 || distance < 0.5) {
+      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, player.position, 0.15f);
+    }
+
+		print(playerPos);
+		print(opponent.transform.rotation);
+		print(lookRotation);
+		print(lookRotation.eulerAngles);
+		print(Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed));
+		opponent.transform.rotation = lookRotation;
+			// Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+		print(opponent.transform.rotation);	
+  }
+
 	void ReplayFrame () {
 		char[] fieldTerminators = {':', ',', '|'};
 		
 		if(rotate) {
-			avatar.transform.RotateAround(body.transform.position, Vector3.up, 0.25f);	
+			opponent.transform.RotateAround(body.transform.position, Vector3.up, 0.25f);
 		}
 		
  		for(int i = 0; i < avatarTransforms.Length; i++) {
@@ -63,8 +112,8 @@ public class Player : MonoBehaviour {
 				
         // Move avatar to starting location)
         if (i == 0) {  // first frame
-          avatar.transform.position = avatarStartPosition;
-          avatar.transform.rotation = avatarStartRotation;
+          opponent.transform.position = opponentStartPosition;
+          opponent.transform.rotation = opponentStartRotation;
 				}
       }
 		
@@ -117,5 +166,4 @@ public class Player : MonoBehaviour {
 
 	// Necessary for active / disabled checkbox
 	void Start () {}
-	
 }
