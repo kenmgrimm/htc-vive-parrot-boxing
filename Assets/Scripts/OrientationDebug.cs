@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
  
 public class OrientationDebug : MonoBehaviour {
   private float length = 0.5f;
@@ -7,16 +8,23 @@ public class OrientationDebug : MonoBehaviour {
   private Color lightGreen = Color.green - new Color(0, 0.5f, 0);
   private Color lightMagenta = Color.magenta - new Color(0.25f, 0.25f, 0.25f);
 
-  public GameObject globalCenter;
-  public GameObject localCenter;
+  private GameObject globalCenter;
+  private GameObject localCenter;
 
-  public bool showLocalOrientation = true;
-  public bool showGlobalOrientation = true;
+  public bool showLocalOrientation = false;
+  public bool showGlobalOrientation = false;
 
-  public bool showLocalCenter = true;
-  public bool showGlobalCenter = true;
+  public bool showLocalCenter = false;
+  public bool showGlobalCenter = false;
 
   void Start() {
+    GameObject globalCenterPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/GlobalCenter.prefab", typeof(GameObject));
+    GameObject localCenterPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LocalCenter.prefab", typeof(GameObject));
+
+    globalCenter = Instantiate(globalCenterPrefab);
+    localCenter = Instantiate(localCenterPrefab);
+    globalCenter.SetActive(false);
+    localCenter.SetActive(false);
   }
 
 	void Update() {
