@@ -3,9 +3,9 @@ using UnityEditor;
  
 public class OrientationDebug : MonoBehaviour {
   private float length = 0.5f;
-  private Color lightBlue = Color.blue - new Color(0, 0, 0.5f);
-  private Color lightRed = Color.red - new Color(0.5f, 0, 0);
-  private Color lightGreen = Color.green - new Color(0, 0.5f, 0);
+  private Color lightBlue = new Color(0.4f, 0.4f, 1f);
+  private Color lightRed = new Color(1f, 0.4f, 0.4f);
+  private Color lightGreen = new Color(0.4f, 1f, 0.4f);
   private Color lightMagenta = Color.magenta - new Color(0.25f, 0.25f, 0.25f);
 
   private GameObject globalCenter;
@@ -23,6 +23,7 @@ public class OrientationDebug : MonoBehaviour {
 
     globalCenter = Instantiate(globalCenterPrefab);
     localCenter = Instantiate(localCenterPrefab);
+
     globalCenter.SetActive(false);
     localCenter.SetActive(false);
   }
