@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using UnityEngine;
 
+// Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
+//  so if those functions aren't present then disabling a script isn't possible.
 public class Player : MonoBehaviour {
 	[SerializeField]
 	private bool rotate = false;
@@ -21,7 +23,14 @@ public class Player : MonoBehaviour {
 	private Vector3 avatarStartPosition = new Vector3(0.72f, 0.5f, 0);
 	private Quaternion avatarStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
 	
-	void Awake () {
+	void Start () {
+		// this.enabled = false;
+		// return;		
+		
+		if (!this.isActiveAndEnabled) {
+			this.enabled = false;
+			return;
+		} 
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
 		
 		avatar = GameObject.FindGameObjectWithTag("Avatar");		
@@ -115,7 +124,4 @@ public class Player : MonoBehaviour {
 		streamReader.Close();
 	}
 
-	// Necessary for active / disabled checkbox
-	void Start () {}
-	
 }

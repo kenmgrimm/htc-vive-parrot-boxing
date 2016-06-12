@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using UnityEngine;
 
+// Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
+//  so if those functions aren't present then disabling a script isn't possible.
 public class Recorder : MonoBehaviour {
 	public string[] names;
 	public float totalTime = 0f;

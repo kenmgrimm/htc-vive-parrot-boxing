@@ -1,6 +1,8 @@
 using System.IO;
 using UnityEngine;
 
+// Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
+//  so if those functions aren't present then disabling a script isn't possible.
 public class Opponent : MonoBehaviour {
 	[SerializeField]
 	private bool rotate = false;
@@ -37,7 +39,10 @@ public class Opponent : MonoBehaviour {
   private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.5f, 0);
 	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 180, 0));
 	
-	void Awake () {
+	void Start () {
+		// this.enabled = false;
+		// return;
+		
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
 		
     if(mockPlayer) {
@@ -51,7 +56,7 @@ public class Opponent : MonoBehaviour {
 		
 		streamReader = new StreamReader("recorder2.txt");
 		
-    InvokeRepeating("MoveOpponent", 1, 1);
+    // InvokeRepeating("MoveOpponent", 1, 1);
 
 		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
@@ -164,6 +169,4 @@ public class Opponent : MonoBehaviour {
 		streamReader.Close();
 	}
 
-	// Necessary for active / disabled checkbox
-	void Start () {}
 }
