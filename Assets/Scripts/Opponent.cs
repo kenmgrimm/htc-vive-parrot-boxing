@@ -56,7 +56,7 @@ public class Opponent : MonoBehaviour {
 		
 		streamReader = new StreamReader("recorder2.txt");
 		
-    // InvokeRepeating("MoveOpponent", 1, 1);
+    InvokeRepeating("MoveOpponent", 1, 1);
 
 		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
