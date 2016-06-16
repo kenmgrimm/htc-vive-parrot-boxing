@@ -28,6 +28,7 @@ public class Opponent : MonoBehaviour {
 	private TransformOrientation[] previousTransformOrientations;
 	
 	private StreamReader streamReader;
+	private int lineNumber = 0;
 	
 	private GameObject opponent;
 	private GameObject body;
@@ -40,9 +41,6 @@ public class Opponent : MonoBehaviour {
 	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 180, 0));
 	
 	void Start () {
-		// this.enabled = false;
-		// return;
-		
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
 		
     if(mockPlayer) {
@@ -58,7 +56,7 @@ public class Opponent : MonoBehaviour {
 		
     InvokeRepeating("MoveOpponent", 1, 1);
 
-		InvokeRepeating("ReplayFrame", 0, 0.011f);
+		InvokeRepeating("ReplayFrame", 0, 0.041f);
 	}
 
 	void Update () {
@@ -68,21 +66,29 @@ public class Opponent : MonoBehaviour {
 		Vector3 playerPos = player.position;
 		Vector3 oppPos = opponent.transform.position;
 		Vector3 towardsPlayer = playerPos - oppPos;
+		// Quaternion lookRotation = Quaternion.Euler(opponent.transform.rotation.eulerAngles);
 		Quaternion lookRotation = Quaternion.LookRotation(towardsPlayer.normalized);
 	
-
     float distance = Vector3.Distance(player.position, opponent.transform.position);
+		Vector3 moveTowardsPoint = player.position;
+		moveTowardsPoint.y = opponent.transform.position.y;
+		
     if (distance > 1 || distance < 0.5) {
-      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, player.position, 0.15f);
+      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, 0.15f);
     }
 
 		print(playerPos);
 		print(opponent.transform.rotation);
 		print(lookRotation);
 		print(lookRotation.eulerAngles);
+
 		print(Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed));
+		
+		// lookRotation.y = towardsPlayer.normalized.y;
+		lookRotation.x = opponent.transform.rotation.x;
+		lookRotation.z = opponent.transform.rotation.z;
 		opponent.transform.rotation = lookRotation;
-			// Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+		// opponent.transform.rotation = Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
 		print(opponent.transform.rotation);	
   }
 
@@ -97,11 +103,14 @@ public class Opponent : MonoBehaviour {
 			Transform controller = avatarTransforms[i];
  
 			string line = streamReader.ReadLine();
+			lineNumber++;
+			print(lineNumber);
 
 			if (line == null) {
 				streamReader.BaseStream.Position = 0;
 				streamReader.DiscardBufferedData();
-				
+				lineNumber = 0;
+
 				return;
 			}
 
