@@ -13,6 +13,9 @@ public class Opponent : MonoBehaviour {
 	private float rotationSpeed = 1.0f;
 	[SerializeField]
 	private float stepSpeed = 1.0f;
+
+	[SerializeField]
+	private bool log = false;
 	
 	[SerializeField]
 	private string[] trackedTransformNames;
@@ -80,19 +83,20 @@ public class Opponent : MonoBehaviour {
       opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, 0.15f);
     }
 
-		print(playerPos);
-		print(opponent.transform.rotation);
-		print(lookRotation);
-		print(lookRotation.eulerAngles);
-
-		print(Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed));
-		
 		// lookRotation.y = towardsPlayer.normalized.y;
 		lookRotation.x = opponent.transform.rotation.x;
 		lookRotation.z = opponent.transform.rotation.z;
 		opponent.transform.rotation = lookRotation;
 		// opponent.transform.rotation = Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-		print(opponent.transform.rotation);	
+
+		if (log) {
+			print(playerPos);
+			print(opponent.transform.rotation);
+			print(lookRotation);
+			print(lookRotation.eulerAngles);
+			print(opponent.transform.rotation);
+			print(Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed));	
+		}
   }
 
 	void ReplayFrame () {
@@ -103,7 +107,8 @@ public class Opponent : MonoBehaviour {
  
 			string line = streamReader.ReadLine();
 			lineNumber++;
-			print(lineNumber);
+			if (log)
+				print(lineNumber);
 
 			if (line == null) {
 				streamReader.BaseStream.Position = 0;
