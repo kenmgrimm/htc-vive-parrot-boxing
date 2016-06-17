@@ -36,7 +36,8 @@ public class Opponent : MonoBehaviour {
 	private GameObject body;
 	
 	// Eventually these should be imported as the body transform
-	private Vector3 opponentStartPosition = new Vector3(0.933f, 0, 0);
+	
+	private Vector3 opponentStartPosition = new Vector3(2.5f, 0, 0);
 	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 270, 0));
 
   private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.5f, 0);
