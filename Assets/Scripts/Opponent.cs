@@ -5,7 +5,9 @@ using UnityEngine;
 //  so if those functions aren't present then disabling a script isn't possible.
 public class Opponent : MonoBehaviour {
 	[SerializeField]
-	private bool rotate = false;
+	private float MAX_DISTANCE = 1.5f;
+	[SerializeField]
+	private float MIN_DISTANCE = 1;
 
 	[SerializeField]
 	private float rotationSpeed = 1.0f;
@@ -52,11 +54,11 @@ public class Opponent : MonoBehaviour {
 		opponent = GameObject.FindGameObjectWithTag("Avatar");		
 		body = GameObject.Find("Capsule");
 		
-		streamReader = new StreamReader("recorder2.txt");
+		streamReader = new StreamReader("jab_cross_upper.txt");
 		
     InvokeRepeating("MoveOpponent", 1, 1);
 
-		InvokeRepeating("ReplayFrame", 0, 0.041f);
+		InvokeRepeating("ReplayFrame", 0, 0.031f);
 	}
 
 	void Update () {
@@ -73,7 +75,7 @@ public class Opponent : MonoBehaviour {
 		Vector3 moveTowardsPoint = player.position;
 		moveTowardsPoint.y = opponent.transform.position.y;
 		
-    if (distance > 1 || distance < 0.5) {
+    if (distance > MAX_DISTANCE || distance < MIN_DISTANCE) {
       opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, 0.15f);
     }
 
@@ -94,10 +96,6 @@ public class Opponent : MonoBehaviour {
 
 	void ReplayFrame () {
 		char[] fieldTerminators = {':', ',', '|'};
-		
-		if(rotate) {
-			opponent.transform.RotateAround(body.transform.position, Vector3.up, 0.25f);
-		}
 		
  		for(int i = 0; i < avatarTransforms.Length; i++) {
 			Transform controller = avatarTransforms[i];
