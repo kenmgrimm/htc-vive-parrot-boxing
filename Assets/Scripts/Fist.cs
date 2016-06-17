@@ -6,17 +6,15 @@ public class Fist : MonoBehaviour {
 	}
 	void Update () {}
 
-	void OnCollisionEnter(Collision collision) {
-		print("collision?  " + collision.collider.gameObject.name);
-		if(collision.collider.gameObject.name == "HeadCollider") {
+	void OnTriggerEnter(Collider other) {
+		// print("collision?  " + other.gameObject.name);
+		if(NotMe(other) && other.gameObject.name == "HeadCollider") {
 			print("collision!!!");
+			GetComponent<AudioSource>().Play();
 		}
 	}
 
-	void OnTriggerEnter(Collider other) {
-		print("collision?  " + other.gameObject.name);
-		if(other.gameObject.name == "HeadCollider") {
-			print("collision!!!");
-		}
+	private bool NotMe(Collider other) {
+		return !other.CompareTag(gameObject.tag);
 	}
 }
