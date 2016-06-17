@@ -24,6 +24,9 @@ public class OrientationDebug : MonoBehaviour {
     globalCenter = Instantiate(globalCenterPrefab);
     localCenter = Instantiate(localCenterPrefab);
 
+    globalCenter.name = gameObject.name + " Global Center";
+    localCenter.name = gameObject.name + " Local Center";
+
     globalCenter.SetActive(false);
     localCenter.SetActive(false);
   }
