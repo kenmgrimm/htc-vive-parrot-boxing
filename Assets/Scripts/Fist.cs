@@ -9,12 +9,12 @@ public class Fist : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		// print("collision?  " + other.gameObject.name);
 		if(NotMe(other) && other.gameObject.name == "HeadCollider") {
-			print("collision!!!");
+			if(Global.DEBUG) print("collision!!!");
 			GetComponent<AudioSource>().Play();
 		}
 	}
 
 	private bool NotMe(Collider other) {
-		return !other.CompareTag(gameObject.tag);
+		return !other.gameObject.CompareTag(gameObject.tag);
 	}
 }
