@@ -43,8 +43,8 @@ public class Opponent : MonoBehaviour {
 	private Vector3 opponentStartPosition = new Vector3(2.5f, 0, 0);
 	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 270, 0));
 
-  private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.5f, 0);
-	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 180, 0));
+  private Vector3 mockPlayerStartPosition = new Vector3(-1f, 1, 0);
+	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 100, 0));
 	
 	void Start () {
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
@@ -62,7 +62,7 @@ public class Opponent : MonoBehaviour {
 		
     InvokeRepeating("MoveOpponent", 1, 1);
 
-		InvokeRepeating("ReplayFrame", 0, 0.031f);
+		InvokeRepeating("ReplayFrame", 0, 0.021f);
 	}
 
 	void Update () {
