@@ -70,21 +70,24 @@ public class Opponent : MonoBehaviour {
 	}
 	
   void MoveOpponent() {
-		Vector3 playerPos = player.position;
-		Vector3 oppPos = opponent.transform.position;
-		Vector3 towardsPlayer = playerPos - oppPos;
+		Vector3 playerGroundPos = player.position;
+		playerGroundPos.y = 0;
+		Vector3 oppGroundPos = opponent.transform.position;
+		oppGroundPos.y = 0;
+
+		Vector3 towardsPlayer = playerGroundPos - oppGroundPos;
 		// Quaternion lookRotation = Quaternion.Euler(opponent.transform.rotation.eulerAngles);
 		Quaternion lookRotation = Quaternion.LookRotation(towardsPlayer.normalized);
 	
-    float distance = Vector3.Distance(player.position, opponent.transform.position);
+    float distance = Vector3.Distance(playerGroundPos, oppGroundPos);
 
 		// Point between player and opponent the target distance away from the player
-		Vector3 moveTowardsPoint = Vector3.Lerp(player.position, opponent.transform.position, TARGET_DISTANCE);
+		Vector3 moveTowardsPoint = Vector3.MoveTowards(playerGroundPos, oppGroundPos, TARGET_DISTANCE);
 		moveTowardsPoint.y = opponent.transform.position.y;
-		
-		print(Mathf.Abs(distance - TARGET_DISTANCE));
 
-		Vector3 direction = (opponent.transform.position - player.position).normalized;
+		Vector3 direction = (oppGroundPos - playerGroundPos).normalized;
+		print("direction: " + direction);
+		print("d - TD: " + Mathf.Abs(distance - TARGET_DISTANCE));
 
     if (distance - TARGET_DISTANCE > DISTANCE_RANGE) {
 			print(player.position);
@@ -95,7 +98,9 @@ public class Opponent : MonoBehaviour {
       opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed);
 		}
 		else if (TARGET_DISTANCE - distance > DISTANCE_RANGE) {
-			opponent.transform.position = player.position + direction * stepSpeed;
+			Vector3 newOpponentPos = player.position + direction * stepSpeed;
+			newOpponentPos.y = opponent.transform.position.y;
+			opponent.transform.position = newOpponentPos;
 			// print(opponent.transform.position);
     }
 
@@ -106,7 +111,7 @@ public class Opponent : MonoBehaviour {
 		// opponent.transform.rotation = Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
 
 		if (log) {
-			print(playerPos);
+			print(playerGroundPos);
 			print(opponent.transform.rotation);
 			print(lookRotation);
 			print(lookRotation.eulerAngles);
