@@ -11,6 +11,7 @@ public class Fist : MonoBehaviour {
 		if(NotMe(other) && other.gameObject.name == "HeadCollider") {
 			if(Global.DEBUG) print("collision!!!");
 			GetComponent<AudioSource>().Play();
+			SteamVR_Controller.Input(1).TriggerHapticPulse(100);
 		}
 	}
 

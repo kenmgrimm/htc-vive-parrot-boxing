@@ -5,14 +5,15 @@ using UnityEngine;
 //  so if those functions aren't present then disabling a script isn't possible.
 public class Opponent : MonoBehaviour {
 	[SerializeField]
-	private float MAX_DISTANCE = 1.5f;
+	private float TARGET_DISTANCE = 1f;
+
 	[SerializeField]
-	private float MIN_DISTANCE = 1;
+	private float DISTANCE_RANGE = 0.05f;
 
 	[SerializeField]
 	private float rotationSpeed = 1.0f;
 	[SerializeField]
-	private float stepSpeed = 1.0f;
+	private float stepSpeed = 0.5f;
 
 	[SerializeField]
 	private bool log = false;
@@ -40,8 +41,8 @@ public class Opponent : MonoBehaviour {
 	
 	// Eventually these should be imported as the body transform
 	
-	private Vector3 opponentStartPosition = new Vector3(2.5f, 0, 0);
-	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 270, 0));
+	private Vector3 opponentStartPosition = new Vector3(0, 0, 6.6f);
+	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 80, 0));
 
   private Vector3 mockPlayerStartPosition = new Vector3(-1f, 1, 0);
 	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 100, 0));
@@ -60,7 +61,7 @@ public class Opponent : MonoBehaviour {
 		
 		streamReader = new StreamReader("jab_cross_upper.txt");
 		
-    InvokeRepeating("MoveOpponent", 1, 1);
+    InvokeRepeating("MoveOpponent", 1, 0.75f);
 
 		InvokeRepeating("ReplayFrame", 0, 0.021f);
 	}
@@ -76,11 +77,26 @@ public class Opponent : MonoBehaviour {
 		Quaternion lookRotation = Quaternion.LookRotation(towardsPlayer.normalized);
 	
     float distance = Vector3.Distance(player.position, opponent.transform.position);
-		Vector3 moveTowardsPoint = player.position;
+
+		// Point between player and opponent the target distance away from the player
+		Vector3 moveTowardsPoint = Vector3.Lerp(player.position, opponent.transform.position, TARGET_DISTANCE);
 		moveTowardsPoint.y = opponent.transform.position.y;
 		
-    if (distance > MAX_DISTANCE || distance < MIN_DISTANCE) {
-      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, 0.15f);
+		print(Mathf.Abs(distance - TARGET_DISTANCE));
+
+		Vector3 direction = (opponent.transform.position - player.position).normalized;
+
+    if (distance - TARGET_DISTANCE > DISTANCE_RANGE) {
+			print(player.position);
+			print(opponent.transform.position);
+			print(moveTowardsPoint);
+			print( Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed));
+
+      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed);
+		}
+		else if (TARGET_DISTANCE - distance > DISTANCE_RANGE) {
+			opponent.transform.position = player.position + direction * stepSpeed;
+			// print(opponent.transform.position);
     }
 
 		// lookRotation.y = towardsPlayer.normalized.y;
