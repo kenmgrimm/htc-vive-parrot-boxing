@@ -4,11 +4,11 @@ using UnityEngine;
 // Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
 //  so if those functions aren't present then disabling a script isn't possible.
 public class Opponent : MonoBehaviour {
-	[SerializeField]
-	private float TARGET_DISTANCE = 1f;
+	// [SerializeField]
+	private float TARGET_DISTANCE = 1.25f;
 
-	[SerializeField]
-	private float DISTANCE_RANGE = 0.05f;
+	// [SerializeField]
+	private float DISTANCE_RANGE = 0.1f;
 
 	[SerializeField]
 	private float rotationSpeed = 1.0f;
@@ -44,8 +44,8 @@ public class Opponent : MonoBehaviour {
 	private Vector3 opponentStartPosition = new Vector3(0, 0, 6.6f);
 	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 80, 0));
 
-  private Vector3 mockPlayerStartPosition = new Vector3(-1f, 1, 0);
-	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 100, 0));
+  private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.83f, 0);
+	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
 	
 	void Start () {
 		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
@@ -86,25 +86,16 @@ public class Opponent : MonoBehaviour {
 		moveTowardsPoint.y = opponent.transform.position.y;
 
 		Vector3 direction = (oppGroundPos - playerGroundPos).normalized;
-		print("direction: " + direction);
-		print("d - TD: " + Mathf.Abs(distance - TARGET_DISTANCE));
 
-    if (distance - TARGET_DISTANCE > DISTANCE_RANGE) {
-			print(player.position);
-			print(opponent.transform.position);
-			print(moveTowardsPoint);
-			print( Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed));
-
+    if (TooFar(distance)) {
       opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed);
 		}
-		else if (TARGET_DISTANCE - distance > DISTANCE_RANGE) {
+		else if (TooClose(distance)) {
 			Vector3 newOpponentPos = player.position + direction * stepSpeed;
 			newOpponentPos.y = opponent.transform.position.y;
 			opponent.transform.position = newOpponentPos;
-			// print(opponent.transform.position);
     }
 
-		// lookRotation.y = towardsPlayer.normalized.y;
 		lookRotation.x = opponent.transform.rotation.x;
 		lookRotation.z = opponent.transform.rotation.z;
 		opponent.transform.rotation = lookRotation;
@@ -118,7 +109,17 @@ public class Opponent : MonoBehaviour {
 			print(opponent.transform.rotation);
 			print(Quaternion.Slerp(opponent.transform.rotation, lookRotation, Time.deltaTime * rotationSpeed));	
 		}
-  }
+	}
+
+	private bool TooFar(float distance) {
+		print("Too Far: " + distance + ": " + (distance - TARGET_DISTANCE > DISTANCE_RANGE));
+		return distance - TARGET_DISTANCE > DISTANCE_RANGE;
+	}
+
+	private bool TooClose(float distance) {
+		print("Too Close: " + distance + ": " + (TARGET_DISTANCE - distance > DISTANCE_RANGE));
+		return TARGET_DISTANCE - distance > DISTANCE_RANGE;
+	}
 
 	void ReplayFrame () {
 		char[] fieldTerminators = {':', ',', '|'};
@@ -155,32 +156,14 @@ public class Opponent : MonoBehaviour {
           opponent.transform.rotation = opponentStartRotation;
 				}
       }
-		
-			// Print all positions / rotations relative to body to help us locally position inside Avatar	
-			// print(this.avatarTransforms[0].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[0].rotation).eulerAngles);
-			
-			// print(this.avatarTransforms[1].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[1].rotation).eulerAngles);
-			
-			// print(this.avatarTransforms[2].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[2].rotation).eulerAngles);
-			
-			TransformOrientation previousOrientation = previousTransformOrientations[i];	
 
-			// Debug.Log(name);
-			// Debug.Log("previousOrientation.rotation: " + previousOrientation.rotation.ToString("F4"));
-			// Debug.Log("current.rotation: " + currentRotation.ToString("F4"));
+			TransformOrientation previousOrientation = previousTransformOrientations[i];	
 			
 			Vector3 velocity = currentPosition - previousOrientation.position;
 			
 			// Find the relative rotation between Quaternion A and B: Quaternion.Inverse(a) * b; 
 			Quaternion rotation = Quaternion.Inverse(previousOrientation.rotation) * currentRotation;
-			// Vector3 rotation = currentRotation.eulerAngles - previousOrientation.rotation.eulerAngles;
-			// Quaternion rotation = Quaternion.FromToRotation(previousOrientation.rotation.eulerAngles, currentRotation.eulerAngles);
-			// Debug.Log("Velocity: " + velocity.ToString("F4"));
-			// Debug.Log("Rotation: " + rotation.ToString("F4"));
-			
+
 			controller.localPosition += velocity;
 			
 			// Move body under head
@@ -192,15 +175,10 @@ public class Opponent : MonoBehaviour {
 			controller.localRotation *= rotation;
 			
 			previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
-			
-			// Debug.Log("Set previous to: " + previousTransformOrientations[i].position.ToString("F4"));
-			// Debug.Log("Set previous to: " + previousTransformOrientations[i].rotation.ToString("F4"));
-		}
-		
+		}		
 	}
 	
 	void Destroy () {
 		streamReader.Close();
 	}
-
 }
