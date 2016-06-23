@@ -8,5 +8,4 @@ public class TransformOrientation {
     this.position = position;
     this.rotation = rotation;
   }
-  
 }

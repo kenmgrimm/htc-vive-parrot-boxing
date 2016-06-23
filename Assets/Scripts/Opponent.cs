@@ -1,5 +1,6 @@
-using System.IO;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Collections;
 
 // Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
 //  so if those functions aren't present then disabling a script isn't possible.
@@ -17,11 +18,10 @@ public class Opponent : MonoBehaviour {
 
 	[SerializeField]
 	private bool log = false;
-	
-	[SerializeField]
-	private string[] trackedTransformNames;
-	[SerializeField]
-	private Transform[] avatarTransforms;
+
+	public Transform head;
+	public Transform leftHand;
+	public Transform rightHand;
 
   [SerializeField]
   private Transform player;
@@ -31,10 +31,11 @@ public class Opponent : MonoBehaviour {
   [SerializeField]
   private bool mockPlayer = true;
 	
-	private TransformOrientation[] previousTransformOrientations;
-	
-	private StreamReader streamReader;
-	private int lineNumber = 0;
+	private OpponentActions jabCrossUpper;
+	private IEnumerator actionIterator;
+
+	private bool firstFrame = true;
+	private Dictionary<string, TransformOrientation> previous;
 	
 	private GameObject opponent;
 	private GameObject body;
@@ -48,26 +49,24 @@ public class Opponent : MonoBehaviour {
 	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
 	
 	void Start () {
-		previousTransformOrientations = new TransformOrientation[avatarTransforms.Length];
-		
     if(mockPlayer) {
       player = (
         GameObject.Instantiate(mockPlayerPrefab, mockPlayerStartPosition, mockPlayerStartRotation) as GameObject
       ).transform;
     }
 
-		opponent = GameObject.FindGameObjectWithTag("Avatar");		
+		opponent = GameObject.FindGameObjectWithTag("Opponent");
+
 		body = GameObject.Find("Capsule");
 		
-		streamReader = new StreamReader("jab_cross_upper.txt");
+		jabCrossUpper = new OpponentActions("jab_cross_upper");
+		actionIterator = jabCrossUpper.opponentActions.GetEnumerator();
 		
     InvokeRepeating("MoveOpponent", 1, 0.75f);
-
 		InvokeRepeating("ReplayFrame", 0, 0.021f);
 	}
 
-	void Update () {
-	}
+	void Update () {}
 	
   void MoveOpponent() {
 		Vector3 playerGroundPos = player.position;
@@ -112,73 +111,63 @@ public class Opponent : MonoBehaviour {
 	}
 
 	private bool TooFar(float distance) {
-		print("Too Far: " + distance + ": " + (distance - TARGET_DISTANCE > DISTANCE_RANGE));
+		// print("Too Far: " + distance + ": " + (distance - TARGET_DISTANCE > DISTANCE_RANGE));
 		return distance - TARGET_DISTANCE > DISTANCE_RANGE;
 	}
 
 	private bool TooClose(float distance) {
-		print("Too Close: " + distance + ": " + (TARGET_DISTANCE - distance > DISTANCE_RANGE));
+		// print("Too Close: " + distance + ": " + (TARGET_DISTANCE - distance > DISTANCE_RANGE));
 		return TARGET_DISTANCE - distance > DISTANCE_RANGE;
 	}
 
 	void ReplayFrame () {
-		char[] fieldTerminators = {':', ',', '|'};
-		
- 		for(int i = 0; i < avatarTransforms.Length; i++) {
-			Transform controller = avatarTransforms[i];
- 
-			string line = streamReader.ReadLine();
-			lineNumber++;
-			if (log)
-				print(lineNumber);
-
-			if (line == null) {
-				streamReader.BaseStream.Position = 0;
-				streamReader.DiscardBufferedData();
-				lineNumber = 0;
-
-				return;
-			}
-
-			string[] values = line.Split(fieldTerminators);
-			string name = values[0];
-			
-			Vector3 currentPosition = new Vector3(float.Parse(values[1]), float.Parse(values[2]), float.Parse(values[3]));
-			Quaternion currentRotation = new Quaternion(float.Parse(values[4]), float.Parse(values[5]), float.Parse(values[6]), float.Parse(values[7]));
-
-			// First frame played for this controller
-			if (previousTransformOrientations[i] == null) {
-        previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
-				
-        // Move avatar to starting location)
-        if (i == 0) {  // first frame
-          opponent.transform.position = opponentStartPosition;
-          opponent.transform.rotation = opponentStartRotation;
-				}
-      }
-
-			TransformOrientation previousOrientation = previousTransformOrientations[i];	
-			
-			Vector3 velocity = currentPosition - previousOrientation.position;
-			
-			// Find the relative rotation between Quaternion A and B: Quaternion.Inverse(a) * b; 
-			Quaternion rotation = Quaternion.Inverse(previousOrientation.rotation) * currentRotation;
-
-			controller.localPosition += velocity;
-			
-			// Move body under head
-			if (i == 0) {
-				body.transform.localPosition = controller.localPosition - new Vector3(0, 0.5f, 0);	
-				body.transform.localRotation = Quaternion.identity;
-			}
-			
-			controller.localRotation *= rotation;
-			
-			previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
-		}		
+		if(!actionIterator.MoveNext()) {
+			actionIterator.Reset();
+			actionIterator.MoveNext();
+		}
+		OpponentAction action = actionIterator.Current as OpponentAction;
+		MoveOpponentTransform(head, action.head);
+		MoveOpponentTransform(leftHand, action.leftHand);
+		MoveOpponentTransform(rightHand, action.rightHand);	
 	}
-	
-	void Destroy () {
-		streamReader.Close();
+
+	void MoveOpponentTransform(Transform controller, TransformOrientation movement) {
+		// Keeping track of the previous orientation should not be necessary.  The recorded movement file
+		//  should be refactored to have deltas, not absolute positioning and rotation
+
+		// First recorded tick played for this controller
+		if (previous == null) {
+			previous = new Dictionary<string, TransformOrientation>();
+
+			if (firstFrame) {
+				firstFrame = false;
+				// Move avatar to starting location)
+				opponent.transform.position = opponentStartPosition;
+				opponent.transform.rotation = opponentStartRotation;
+			}
+		}
+		if(!previous.ContainsKey(controller.name)) {
+			previous[controller.name] = movement;
+		}
+
+		TransformOrientation previousOrientation = previous[controller.name];
+
+		Vector3 velocity = movement.position - previousOrientation.position;
+
+		// Find the relative rotation between Quaternion A and B: Quaternion.Inverse(a) * b; 
+		Quaternion rotation = Quaternion.Inverse(previousOrientation.rotation) * movement.rotation;
+
+		controller.localPosition += velocity;
+
+		if(controller.name.Equals("Head")) {  //abstract
+			body.transform.localPosition = controller.localPosition - new Vector3(0, 0.5f, 0);
+			body.transform.localRotation = Quaternion.identity;
+		}
+		
+		controller.localRotation *= rotation;
+
+		Vector3 previousPosition = new Vector3(movement.position.x, movement.position.y, movement.position.z);
+		Quaternion previousRotation = new Quaternion(movement.rotation.x, movement.rotation.y, movement.rotation.z, movement.rotation.w);
+		previous[controller.name] = new TransformOrientation(previousPosition, previousRotation);
 	}
 }
