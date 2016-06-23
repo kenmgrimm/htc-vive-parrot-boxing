@@ -55,7 +55,7 @@ public class Opponent : MonoBehaviour {
       ).transform;
     }
 
-		opponent = GameObject.FindGameObjectWithTag("Opponent");
+		opponent = GameObject.Find("Opponent");
 
 		body = GameObject.Find("Capsule");
 		
