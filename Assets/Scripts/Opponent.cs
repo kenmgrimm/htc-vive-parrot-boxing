@@ -111,12 +111,10 @@ public class Opponent : MonoBehaviour {
 	}
 
 	private bool TooFar(float distance) {
-		// print("Too Far: " + distance + ": " + (distance - TARGET_DISTANCE > DISTANCE_RANGE));
 		return distance - TARGET_DISTANCE > DISTANCE_RANGE;
 	}
 
 	private bool TooClose(float distance) {
-		// print("Too Close: " + distance + ": " + (TARGET_DISTANCE - distance > DISTANCE_RANGE));
 		return TARGET_DISTANCE - distance > DISTANCE_RANGE;
 	}
 
@@ -159,7 +157,7 @@ public class Opponent : MonoBehaviour {
 
 		controller.localPosition += velocity;
 
-		if(controller.name.Equals("Head")) {  //abstract
+		if(controller.name.Equals("Head")) {
 			body.transform.localPosition = controller.localPosition - new Vector3(0, 0.5f, 0);
 			body.transform.localRotation = Quaternion.identity;
 		}

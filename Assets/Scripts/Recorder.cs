@@ -1,8 +1,11 @@
 ﻿using System.IO;
 using UnityEngine;
 
-// Disabling a script only turns off Start & Update (plus related such as FixedUpdate) and OnGUI, 
+// Disabling a script only turns off **Start & Update** (plus related such as FixedUpdate) and OnGUI, 
 //  so if those functions aren't present then disabling a script isn't possible.
+
+// CRITICAL to have mm precision on beginning of recording and match that in playback opponent
+//   positioning
 public class Recorder : MonoBehaviour {
 	public string[] names;
 	public float totalTime = 0f;
@@ -11,18 +14,19 @@ public class Recorder : MonoBehaviour {
 	
 	private StreamWriter streamWriter;
 
+	public void BeginRecording() {
+		InvokeRepeating("RecordFrame", 0, 0.011f);
+	}
+
 	void Start () {
-	  streamWriter = new StreamWriter("recorder.txt");
-		
-		GameObject.FindGameObjectWithTag("Head").SetActive(false);
-		GameObject.FindGameObjectWithTag("Left Fist").SetActive(false);
-		GameObject.FindGameObjectWithTag("Right Fist").SetActive(false);
-		
-		InvokeRepeating("RecordFrame", 10, 0.011f);
+		int seq = 0;
+		string path = "recording_0.txt";
+		while(File.Exists(path = "recording_" + ++seq + ".txt")) {}
+
+	  streamWriter = new StreamWriter(path);
 	}
 	
 	void RecordFrame() {
-		print(Time.deltaTime);
 		for (int i = 0; i < trackedTransforms.Length; i++) {
 			Transform tracked = trackedTransforms[i];
 			string name = names[i];

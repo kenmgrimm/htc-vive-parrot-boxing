@@ -24,9 +24,6 @@ public class Player : MonoBehaviour {
 	private Quaternion avatarStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
 	
 	void Start () {
-		// this.enabled = false;
-		// return;		
-		
 		if (!this.isActiveAndEnabled) {
 			this.enabled = false;
 			return;
@@ -61,7 +58,6 @@ public class Player : MonoBehaviour {
 			}
 
 			string[] values = line.Split(fieldTerminators);
-			string name = values[0];
 			
 			Vector3 currentPosition = new Vector3(float.Parse(values[1]), float.Parse(values[2]), float.Parse(values[3]));
 			Quaternion currentRotation = new Quaternion(float.Parse(values[4]), float.Parse(values[5]), float.Parse(values[6]), float.Parse(values[7]));
@@ -76,31 +72,13 @@ public class Player : MonoBehaviour {
           avatar.transform.rotation = avatarStartRotation;
 				}
       }
-		
-			// Print all positions / rotations relative to body to help us locally position inside Avatar	
-			// print(this.avatarTransforms[0].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[0].rotation).eulerAngles);
-			
-			// print(this.avatarTransforms[1].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[1].rotation).eulerAngles);
-			
-			// print(this.avatarTransforms[2].position - this.body.transform.position);
-			// print((Quaternion.Inverse(this.body.transform.rotation) * this.avatarTransforms[2].rotation).eulerAngles);
-			
+
 			TransformOrientation previousOrientation = previousTransformOrientations[i];	
 
-			// Debug.Log(name);
-			// Debug.Log("previousOrientation.rotation: " + previousOrientation.rotation.ToString("F4"));
-			// Debug.Log("current.rotation: " + currentRotation.ToString("F4"));
-			
 			Vector3 velocity = currentPosition - previousOrientation.position;
 			
 			// Find the relative rotation between Quaternion A and B: Quaternion.Inverse(a) * b; 
 			Quaternion rotation = Quaternion.Inverse(previousOrientation.rotation) * currentRotation;
-			// Vector3 rotation = currentRotation.eulerAngles - previousOrientation.rotation.eulerAngles;
-			// Quaternion rotation = Quaternion.FromToRotation(previousOrientation.rotation.eulerAngles, currentRotation.eulerAngles);
-			// Debug.Log("Velocity: " + velocity.ToString("F4"));
-			// Debug.Log("Rotation: " + rotation.ToString("F4"));
 			
 			controller.localPosition += velocity;
 			
@@ -113,11 +91,7 @@ public class Player : MonoBehaviour {
 			controller.localRotation *= rotation;
 			
 			previousTransformOrientations[i] = new TransformOrientation(currentPosition, currentRotation);
-			
-			// Debug.Log("Set previous to: " + previousTransformOrientations[i].position.ToString("F4"));
-			// Debug.Log("Set previous to: " + previousTransformOrientations[i].rotation.ToString("F4"));
 		}
-		
 	}
 	
 	void Destroy () {
