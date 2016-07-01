@@ -13,7 +13,7 @@
 using UnityEngine;
 using Valve.VR;
 
-public class SteamVR_Controller
+public class SteamVR_Controller2
 {
 	public class ButtonMask
 	{

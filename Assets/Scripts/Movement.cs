@@ -2,12 +2,12 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 
-class OpponentActions {
-	public List<OpponentAction> opponentActions = new List<OpponentAction>(); 
+public class Movement {
+	public List<OpponentAction> actions = new List<OpponentAction>(); 
 
 	private static char[] FIELD_TERMINATORS = {':', ',', '|'};
 
-  public OpponentActions(string name) {
+  public Movement(string name) {
     StreamReader streamReader = new StreamReader(name + ".txt");
 
 		while(!streamReader.EndOfStream) {
@@ -15,7 +15,7 @@ class OpponentActions {
 			TransformOrientation leftHand = ProcessLine(streamReader.ReadLine());
 			TransformOrientation rightHand = ProcessLine(streamReader.ReadLine());
 
-		 	opponentActions.Add(new OpponentAction(head, leftHand, rightHand));
+		 	actions.Add(new OpponentAction(head, leftHand, rightHand));
 		}
 		
 		streamReader.Close();

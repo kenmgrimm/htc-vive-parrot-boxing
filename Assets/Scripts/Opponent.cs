@@ -31,7 +31,7 @@ public class Opponent : MonoBehaviour {
   [SerializeField]
   private bool mockPlayer = true;
 	
-	private OpponentActions jabCrossUpper;
+	private Movement jabCrossUpper;
 	private IEnumerator actionIterator;
 
 	private bool firstFrame = true;
@@ -59,8 +59,8 @@ public class Opponent : MonoBehaviour {
 
 		body = GameObject.Find("Capsule");
 		
-		jabCrossUpper = new OpponentActions("jab_cross_upper");
-		actionIterator = jabCrossUpper.opponentActions.GetEnumerator();
+		jabCrossUpper = new Movement("jab_cross_upper");
+		actionIterator = jabCrossUpper.actions.GetEnumerator();
 		
     InvokeRepeating("MoveOpponent", 1, 0.75f);
 		InvokeRepeating("ReplayFrame", 0, 0.021f);
