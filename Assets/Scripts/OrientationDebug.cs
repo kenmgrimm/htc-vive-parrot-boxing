@@ -6,7 +6,7 @@ public class OrientationDebug : MonoBehaviour {
   private Color lightBlue = new Color(0.4f, 0.4f, 1f);
   private Color lightRed = new Color(1f, 0.4f, 0.4f);
   private Color lightGreen = new Color(0.4f, 1f, 0.4f);
-  private Color lightMagenta = Color.magenta - new Color(0.25f, 0.25f, 0.25f);
+  //  private Color lightMagenta = Color.magenta - new Color(0.25f, 0.25f, 0.25f);
 
   private GameObject globalCenter;
   private GameObject localCenter;

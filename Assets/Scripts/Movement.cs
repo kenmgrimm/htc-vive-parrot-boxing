@@ -3,19 +3,20 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class Movement {
-	public List<OpponentAction> actions = new List<OpponentAction>(); 
+	public List<OpponentAction> Actions { get; set; }
 
 	private static char[] FIELD_TERMINATORS = {':', ',', '|'};
 
   public Movement(string name) {
     StreamReader streamReader = new StreamReader(name + ".txt");
+		Actions = new List<OpponentAction>();
 
 		while(!streamReader.EndOfStream) {
 			TransformOrientation head = ProcessLine(streamReader.ReadLine());
 			TransformOrientation leftHand = ProcessLine(streamReader.ReadLine());
 			TransformOrientation rightHand = ProcessLine(streamReader.ReadLine());
 
-		 	actions.Add(new OpponentAction(head, leftHand, rightHand));
+		 	Actions.Add(new OpponentAction(head, leftHand, rightHand));
 		}
 		
 		streamReader.Close();
@@ -32,7 +33,7 @@ public class Movement {
 }
 
 
-class OpponentAction {
+public class OpponentAction {
 	public TransformOrientation head;
 	public TransformOrientation leftHand;
 	public TransformOrientation rightHand;
