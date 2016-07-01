@@ -28,8 +28,9 @@ public class Recorder : MonoBehaviour {
 			streamWriter.Close();
 		}
 
-		string path = "recording_";
-		while(File.Exists(path + lastSequence++ + ".txt")) {}
+		string prefix = "recording_";
+		string path = "";
+		while(File.Exists(path = prefix + lastSequence++ + ".txt")) {}
 
 	  streamWriter = new StreamWriter(path);
 	}
@@ -48,19 +49,19 @@ public class Recorder : MonoBehaviour {
 		
 		for (int i = 0; i < trackedTransforms.Length; i++) {
 			Transform tracked = trackedTransforms[i];
-			string name = names[i];
+			string controllerName = names[i];
 			
 			parrotingTransforms[i].position = tracked.position;
 			parrotingTransforms[i].rotation = tracked.rotation;
 
-			line += buildLine(name, tracked);
+			line += buildLine(controllerName, tracked);
 		}
 		
-		streamWriter.WriteLine(line);
+		streamWriter.Write(line);
 	}
 
 	private string buildLine(string controllerName, Transform controller) {
-		return name + ':' + 
+		return controllerName + ':' + 
 			controller.position.x + "," + 
 			controller.position.y + "," +
 			controller.position.z + "|" +
@@ -70,7 +71,7 @@ public class Recorder : MonoBehaviour {
 			controller.rotation.w + "\n";
 	}
 
-	void Destroy () {
+	void OnDestroy () {
 		streamWriter.Close();
 	}
 }
