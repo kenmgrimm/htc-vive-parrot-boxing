@@ -59,7 +59,7 @@ public class Opponent : MonoBehaviour {
 
 		body = GameObject.Find("Capsule");
 		
-		jabCrossUpper = new Movement("jab_cross_upper");
+		jabCrossUpper = new Movement("recording_0");
 		actionIterator = jabCrossUpper.Actions.GetEnumerator();
 		
     InvokeRepeating("MoveOpponent", 1, 0.75f);

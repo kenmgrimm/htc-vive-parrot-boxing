@@ -14,37 +14,58 @@ public class Recorder : MonoBehaviour {
 	
 	private StreamWriter streamWriter;
 	private int lastSequence = 0;
+	private bool recording = false;
 
-	public void BeginRecording() {
+	private SteamVR_Controller.Device controller;
+
+	private void StartRecording() {
+		NewFile();
+
 		InvokeRepeating("RecordFrame", 0, 0.011f);
 	}
 
+	private void StopRecording() {
+		CloseFile();
+
+		CancelInvoke("RecordFrame");
+	}
+
 	void Start () {
-		NewFile();
+		controller = SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Leftmost));
 	}
 
 	private void NewFile() {
-		if(streamWriter != null) {
-			streamWriter.Close();
-		}
-
 		string prefix = "recording_";
 		string path = "";
 		while(File.Exists(path = prefix + lastSequence++ + ".txt")) {}
 
+		Debug.Log("Recording to: " + path);
+
 	  streamWriter = new StreamWriter(path);
 	}
 
-	void Update() {
-    SteamVR_Controller.Device controller = 
-			SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Leftmost));
+	private void CloseFile() {
+		if(streamWriter != null) {
+			streamWriter.Close();
+		}
+	}
 
+	void Update() {
 		if(controller.GetHairTriggerDown()) {
-			NewFile();
+			if(!recording) {
+				StartRecording();
+			}
+			else {
+				StopRecording();
+			}
+			recording = !recording;
 		}
 	}
 	
 	void RecordFrame() {
+		if (!recording) {
+			return;
+		}
 		string line = "";
 		
 		for (int i = 0; i < trackedTransforms.Length; i++) {
@@ -72,6 +93,6 @@ public class Recorder : MonoBehaviour {
 	}
 
 	void OnDestroy () {
-		streamWriter.Close();
+		CloseFile();
 	}
 }
