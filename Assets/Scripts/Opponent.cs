@@ -67,7 +67,7 @@ public class Opponent : MonoBehaviour {
 		jabCrossUpper = new Movement("recording_" + seq);
 		actionIterator = jabCrossUpper.Actions.GetEnumerator();
 		
-    // InvokeRepeating("MoveOpponent", 1, 0.75f);
+    InvokeRepeating("MoveOpponent", 1, 0.75f);
 		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
 
