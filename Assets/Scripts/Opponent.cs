@@ -11,10 +11,8 @@ public class Opponent : MonoBehaviour {
 	// [SerializeField]
 	private float DISTANCE_RANGE = 0.1f;
 
-	[SerializeField]
 	private float rotationSpeed = 1.0f;
-	[SerializeField]
-	private float stepSpeed = 0.5f;
+	private float stepSpeed = 0.2f;
 
 	[SerializeField]
 	private bool log = false;
