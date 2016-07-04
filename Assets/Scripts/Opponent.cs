@@ -39,6 +39,8 @@ public class Opponent : MonoBehaviour {
 	
 	private GameObject opponent;
 	private GameObject body;
+
+	Vector3 recordingPositionOffset;
 	
 	// Eventually these should be imported as the body transform
 	
@@ -149,9 +151,22 @@ public class Opponent : MonoBehaviour {
 
 		// First recorded tick played for this controller
 		if(!previous.ContainsKey(controller.name)) {
-			// Set controller initial local orientation within body 
-			controller.transform.localPosition = movement.position;
-			controller.transform.localRotation = movement.rotation;
+
+			// ******
+			// Set controller initial local orientation within body
+
+			if(controller.name.Equals("Head")) {
+				controller.transform.localPosition = Vector3.zero;
+				controller.transform.localRotation = movement.rotation;
+
+				// Use the head's position as body position offset from recording to play
+				recordingPositionOffset = movement.position;
+			}
+			else {
+				controller.transform.localPosition = movement.position - recordingPositionOffset;
+				controller.transform.localRotation = movement.rotation;
+			}
+
 			// ******
 
 			previous[controller.name] = movement;
