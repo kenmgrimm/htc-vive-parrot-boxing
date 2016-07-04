@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 
 // Disabling a script only turns off **Start & Update** (plus related such as FixedUpdate) and OnGUI, 
@@ -16,7 +17,8 @@ public class Recorder : MonoBehaviour {
 	private int lastSequence = 0;
 	private bool recording = false;
 
-	private SteamVR_Controller.Device controller;
+	private SteamVR_Controller.Device left;
+	private SteamVR_Controller.Device right;
 
 	private void StartRecording() {
 		NewFile();
@@ -31,7 +33,8 @@ public class Recorder : MonoBehaviour {
 	}
 
 	void Start () {
-		controller = SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Leftmost));
+		left = SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Leftmost));
+		right = SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost));
 	}
 
 	private void NewFile() {
@@ -51,7 +54,7 @@ public class Recorder : MonoBehaviour {
 	}
 
 	void Update() {
-		if(controller.GetHairTriggerDown()) {
+		if(left.GetHairTriggerDown() || right.GetHairTriggerDown()) {
 			if(!recording) {
 				StartRecording();
 			}
@@ -83,13 +86,13 @@ public class Recorder : MonoBehaviour {
 
 	private string buildLine(string controllerName, Transform controller) {
 		return controllerName + ':' + 
-			controller.position.x + "," + 
-			controller.position.y + "," +
-			controller.position.z + "|" +
-			controller.rotation.x + "," +
-			controller.rotation.y + "," +
-			controller.rotation.z + "," +
-			controller.rotation.w + "\n";
+			controller.localPosition.x + "," + 
+			controller.localPosition.y + "," +
+			controller.localPosition.z + "|" +
+			controller.localRotation.x + "," +
+			controller.localRotation.y + "," +
+			controller.localRotation.z + "," +
+			controller.localRotation.w + "\n";
 	}
 
 	void OnDestroy () {

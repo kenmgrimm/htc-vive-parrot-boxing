@@ -42,12 +42,15 @@ public class Opponent : MonoBehaviour {
 	
 	// Eventually these should be imported as the body transform
 	
-	private Vector3 opponentStartPosition = new Vector3(0, 0, 6.6f);
-	private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 80, 0));
+	// private Vector3 opponentStartPosition = new Vector3(0, 0, 6.6f);
+	// private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 80, 0));
 
   private Vector3 mockPlayerStartPosition = new Vector3(-1f, 0.83f, 0);
 	private Quaternion mockPlayerStartRotation = Quaternion.Euler(new Vector3(0, 0, 0));
-	
+
+	public int seq;
+
+
 	void Start () {
     if(mockPlayer) {
       player = (
@@ -59,11 +62,11 @@ public class Opponent : MonoBehaviour {
 
 		body = GameObject.Find("Capsule");
 		
-		jabCrossUpper = new Movement("recording_0");
+		jabCrossUpper = new Movement("recording_" + seq);
 		actionIterator = jabCrossUpper.Actions.GetEnumerator();
 		
-    InvokeRepeating("MoveOpponent", 1, 0.75f);
-		InvokeRepeating("ReplayFrame", 0, 0.021f);
+    // InvokeRepeating("MoveOpponent", 1, 0.75f);
+		InvokeRepeating("ReplayFrame", 0, 0.011f);
 	}
 
 	void Update () {}
@@ -132,19 +135,25 @@ public class Opponent : MonoBehaviour {
 	void MoveOpponentTransform(Transform controller, TransformOrientation movement) {
 		// Keeping track of the previous orientation should not be necessary.  The recorded movement file
 		//  should be refactored to have deltas, not absolute positioning and rotation
-
-		// First recorded tick played for this controller
+		
 		if (previous == null) {
 			previous = new Dictionary<string, TransformOrientation>();
 
 			if (firstFrame) {
 				firstFrame = false;
 				// Move avatar to starting location)
-				opponent.transform.position = opponentStartPosition;
-				opponent.transform.rotation = opponentStartRotation;
+				// opponent.transform.position = opponentStartPosition;
+				// opponent.transform.rotation = opponentStartRotation;
 			}
 		}
+
+		// First recorded tick played for this controller
 		if(!previous.ContainsKey(controller.name)) {
+			// Set controller initial local orientation within body 
+			controller.transform.localPosition = movement.position;
+			controller.transform.localRotation = movement.rotation;
+			// ******
+
 			previous[controller.name] = movement;
 		}
 

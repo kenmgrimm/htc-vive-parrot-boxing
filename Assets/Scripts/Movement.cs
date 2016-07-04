@@ -22,6 +22,10 @@ public class Movement {
 		streamReader.Close();
   }
 
+	public OpponentAction InitialOrientation() {
+		return Actions[0];
+	}
+
 	private TransformOrientation ProcessLine(string line) {
 		string[] values = line.Split(FIELD_TERMINATORS);
 
