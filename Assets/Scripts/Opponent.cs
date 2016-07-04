@@ -6,13 +6,14 @@ using System.Collections;
 //  so if those functions aren't present then disabling a script isn't possible.
 public class Opponent : MonoBehaviour {
 	// [SerializeField]
-	private float TARGET_DISTANCE = 1.25f;
+	private float TARGET_DISTANCE = 1f;
 
 	// [SerializeField]
 	private float DISTANCE_RANGE = 0.1f;
 
-	private float rotationSpeed = 1.0f;
-	private float stepSpeed = 0.2f;
+	private float rotationSpeed = 0.25f;
+	private float stepDistance = 0.5f;
+	private float stepSpeed = 1;
 
 	[SerializeField]
 	private bool log = false;
@@ -41,7 +42,6 @@ public class Opponent : MonoBehaviour {
 	Vector3 recordingPositionOffset;
 	
 	// Eventually these should be imported as the body transform
-	
 	// private Vector3 opponentStartPosition = new Vector3(0, 0, 6.6f);
 	// private Quaternion opponentStartRotation = Quaternion.Euler(new Vector3(0, 80, 0));
 
@@ -90,7 +90,7 @@ public class Opponent : MonoBehaviour {
 		Vector3 direction = (oppGroundPos - playerGroundPos).normalized;
 
     if (TooFar(distance)) {
-      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepSpeed);
+      opponent.transform.position = Vector3.MoveTowards(opponent.transform.position, moveTowardsPoint, stepDistance);
 		}
 		else if (TooClose(distance)) {
 			Vector3 newOpponentPos = player.position + direction * stepSpeed;
@@ -139,12 +139,12 @@ public class Opponent : MonoBehaviour {
 		if (previous == null) {
 			previous = new Dictionary<string, TransformOrientation>();
 
-			if (firstFrame) {
-				firstFrame = false;
+			// if (firstFrame) {
+				// firstFrame = false;
 				// Move avatar to starting location)
 				// opponent.transform.position = opponentStartPosition;
 				// opponent.transform.rotation = opponentStartRotation;
-			}
+			// }
 		}
 
 		// First recorded tick played for this controller
