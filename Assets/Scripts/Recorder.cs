@@ -38,7 +38,7 @@ public class Recorder : MonoBehaviour {
 	}
 
 	private void NewFile() {
-		string prefix = "recording_";
+		string prefix = "Assets/Scripts/Action Animations/recording_";
 		string path = "";
 		while(File.Exists(path = prefix + lastSequence++ + ".txt")) {}
 

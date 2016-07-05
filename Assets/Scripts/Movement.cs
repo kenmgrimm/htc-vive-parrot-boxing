@@ -3,12 +3,24 @@ using UnityEngine;
 using System.Collections.Generic;
 
 public class Movement {
+  private static string[] MOVEMENT_TYPES = { "jab1", "cross1", "dodge_left", "dodge_right", "left_hook", "right_hook",
+    "left_uppercut", "right_uppercut", "left_guard", "right_guard", "guard_cheeks", "guard_face", "hand to face" };
+
 	public List<OpponentAction> Actions { get; set; }
+
+  private static Dictionary<string, Movement> movements;
 
 	private static char[] FIELD_TERMINATORS = {':', ',', '|'};
 
+  public static void LoadAnimations() {
+    movements = new Dictionary<string, Movement>();
+    foreach (string movementName in MOVEMENT_TYPES) {
+      movements[movementName] = new Movement(movementName);
+    }
+  }
+
   public Movement(string name) {
-    StreamReader streamReader = new StreamReader(name + ".txt");
+    StreamReader streamReader = new StreamReader("Assets/Scripts/Action Animations/" + name + ".txt");
 		Actions = new List<OpponentAction>();
 
 		while(!streamReader.EndOfStream) {
