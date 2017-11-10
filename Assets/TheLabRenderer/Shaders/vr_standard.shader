@@ -1,4 +1,6 @@
-﻿// Copyright (c) Valve Corporation, All rights reserved. ======================================================================================================
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Copyright (c) Valve Corporation, All rights reserved. ======================================================================================================
 
 Shader "Valve/vr_standard"
 {
@@ -241,7 +243,7 @@ Shader "Valve/vr_standard"
 						o.vPositionWs.xyz = vPositionWs.xyz;
 					}
 					#endif
-					o.vPositionPs.xyzw = mul( UNITY_MATRIX_MVP, i.vPositionOs.xyzw );
+					o.vPositionPs.xyzw = UnityObjectToClipPos( i.vPositionOs.xyzw );
 
 					// Normal
 					float3 vNormalWs = UnityObjectToWorldNormal( i.vNormalOs.xyz );
